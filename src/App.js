@@ -1,24 +1,60 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import Search from "./components/Search";
+import Country from "./components/Country";
 
 function App() {
+  const [name, setName] = useState("");
+  const [country, setCountry] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [available, setAvailable] = useState(true);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://restcountries.eu/rest/v2/name/${name}`
+      );
+      const data = await response.json();
+      setLoading(false);
+      setAvailable(true);
+      setCountry(data);
+    } catch (e) {
+      setLoading(false);
+      setAvailable(false);
+    }
+  };
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    fetchData();
+    console.log(country);
+  };
+
+  const handleChange = (e) => {
+    const newName = e.target.value;
+    setName(newName);
+  };
+
+  useEffect(() => {
+    function onKeyup(e) {
+      if (e.key === "Enter") {
+        fetchData();
+      }
+    }
+    window.addEventListener("keyup", onKeyup);
+    return () => window.removeEventListener("keyup", onKeyup);
+  }, [name]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main>
+      <Search
+        handleChange={handleChange}
+        name={name}
+        handleClick={handleClick}
+      />
+      <Country country={country} loading={loading} available={available} />
+    </main>
   );
 }
 
