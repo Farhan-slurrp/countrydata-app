@@ -1,4 +1,4 @@
-#About
+# About
 
 Exploring Material UI and implement my study in ReactJS
 
